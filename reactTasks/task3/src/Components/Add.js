@@ -19,6 +19,7 @@ function Add() {
   return (
     <div className='d-flex w-100 h-100 justify-content-center align-items-center'>
         <div className='w-50 border bg-light p-5'>
+        <button className='btn ms-1 btn-success' onClick={() => navigat(-1)}>Back</button><br/>
         <form onSubmit={handleSubmit}>
             <div>
                 <label htmlFor='name'>Name:</label>

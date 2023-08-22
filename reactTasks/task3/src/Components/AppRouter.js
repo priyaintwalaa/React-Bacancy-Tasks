@@ -6,21 +6,25 @@ import Edit from './Edit';
 import Delete from './Delete';
 import User from './User';
 import UserDetails from './UserDetails';
+import NavBar from './NavBar';
 
 function AppRouter() {
   return (
-    <BrowserRouter>
+    // <BrowserRouter>
+    <>
+       <NavBar/>
         <Routes>
 
             {/* <Route path='/' element={<App/>} /> */}
-            <Route path='/' element={<App/>} />
-            <Route path="/user" element={<User />}/> 
-            <Route path='/user/:id' element={<UserDetails/>} />
-            <Route path='/user/add' element={<Add/>}  />
-            <Route path='/user/edit/:id' element={<Edit/>} />
-            <Route path='/user/delete/:id' element={<Delete/>} />
+            <Route path='/' element={<User/>} />
+            {/* <Route path="/user" element={<User />}/>  */}
+            <Route path='/:id' element={<UserDetails/>} />
+            <Route path='/add' element={<Add/>}  />
+            <Route path='/edit/:id' element={<Edit/>} />
+            <Route path='/delete/:id' element={<Delete/>} />
         </Routes>
-    </BrowserRouter>
+    {/* // </BrowserRouter> */}
+    </>
   )
 }
 

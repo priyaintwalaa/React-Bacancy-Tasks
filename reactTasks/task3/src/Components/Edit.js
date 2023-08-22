@@ -25,12 +25,12 @@ function Edit() {
   return (
     <div className='d-flex w-100 h-100 justify-content-center align-items-center'>
     <div className='w-50 border bg-light p-5'>
+    <button className='btn ms-1 btn-success' onClick={() => navigat(-1)}>Back</button>
     <form onSubmit={handleSubmit}>
     <div>
             <label htmlFor='name'>ID:</label>
             <input type="text" name="name" value={data.id} disabled className='form-control'
-           
-            />
+             />
         </div>
         <div>
             <label htmlFor='name'>Name:</label>
@@ -46,6 +46,7 @@ function Edit() {
         </div><br/>
         <button className='btn btn-info'>Submit</button>
         </form>
+        
     </div>
 </div>
   )

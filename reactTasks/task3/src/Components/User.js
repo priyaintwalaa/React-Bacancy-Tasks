@@ -64,8 +64,7 @@ function User() {
               </tbody>
             </table>
             :<h3>No record found!</h3>
-            }
-            
+            }     
           </div>
   )}
 export default User
