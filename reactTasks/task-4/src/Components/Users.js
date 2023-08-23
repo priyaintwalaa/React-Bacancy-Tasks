@@ -1,69 +1,79 @@
 // import React,{useState} from 'react'
 import { useEffect, useState } from "react";
-import { Outlet, Link, useNavigate, useParams } from "react-router-dom";
-import {FaSortUp} from 'react-icons/fa'
+import { Outlet, Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { FaSortUp } from "react-icons/fa";
 // import { Navigate } from "react-router-dom";
 import Modal from "react-modal";
 
-function Users({ data, setData,viewObjData, deleteObj, editUserDetail, onisEditable }) {
- 
+
+function Users({
+  data,
+  setData,
+  viewObjData,
+  deleteObj,
+  editUserDetail,
+  onisEditable,
+}) {
   const navigate = useNavigate();
-  const {id} = useParams();
+  const { id } = useParams();
+  const [searchParams,setSearchParams] = useSearchParams()
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  // const [deleteid, setdeleteId] = useState();
-
-//sorting
-  const [isSorted,setIsSorted] = useState(false)
-
-  const handleSortClick = ()=>{
-    const sortedData = [...data]
-    setIsSorted(!isSorted)
-    sortedData.sort((a,b)=>{
-     const NameA = a.name.toLowerCase()
-     const NameB = b.name.toLowerCase()
-     return  NameA.localeCompare(NameB);
-    })
-    setData(sortedData);
-  }
-
-
-
-  //search
+  const [isSorted, setIsSorted] = useState(false);
   const [search, setSearch] = useState("");
+  
+  //sorting
+  const handleSortClick = () => {
+    const sortedData = [...data];
+    setIsSorted(!isSorted);
+    sortedData.sort((a, b) => {
+      const NameA = a.name.toLowerCase();
+      const NameB = b.name.toLowerCase();
+      return NameA.localeCompare(NameB);
+    });
+    setData(sortedData);
+  };
+
+  
+  //search
+  const datafilter = data.filter((item)=>{
+    return search === "" ? item : item.name.toLowerCase().includes(search.toLowerCase())
+  })
+
+  //pagination
+  const [page, setPage] = useState(1);
+  const [selectedValue, setSeletectedValue] = useState(5);
+  
+  const noOfPages = Math.ceil(Number(datafilter.length/+selectedValue));
+  console.log("first " + noOfPages)
+  
+  const pageVal = searchParams.get('pageValue')
+  console.log(pageVal)
 
   useEffect(()=>{
-    if(id){
-      setModalIsOpen(true)
+    if(pageVal){
+      setPage(pageVal)
+      console.log("sdfghjkl"+noOfPages +"dfghjkl"+pageVal)
+      if(+pageVal > noOfPages){
+        setSearchParams({pageValue:1})
+      }      
     }
-  },[id])
+  },[pageVal,search])
 
-  // pagination
-  const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 5;
-  const lastIndex = currentPage * recordsPerPage;
-  const firstIndex = lastIndex - recordsPerPage;
-  const records = data?.slice(firstIndex, lastIndex);
-  const noOfPage = Math.ceil(data?.length / recordsPerPage);
-  const numbers = [...Array(noOfPage + 1).keys()]?.slice(1);
+  const selectPageHandler = (selectedPage) => {
+    if (
+      selectedPage >= 1 &&
+      selectedPage <= noOfPages &&
+      selectedPage !== page
+    )
+    setPage(selectedPage);
+    setSearchParams({pageValue:selectedPage})
+  };
 
-  function prePage(){
-     if(currentPage !== 1){
-      setCurrentPage(currentPage - 1)
-     }
-  }
-
-  function changeCurrPage(num){
-     setCurrentPage(num)
-  }
-
-  function nextPage(){
-    if(currentPage !== noOfPage){
-      setCurrentPage(currentPage + 1)
-     }
-  }
-
- 
+  const handleSelectChange = (event) => {
+    console.log(event.target.value);
+    setSeletectedValue(event.target.value);
+  };
 
   function viewUser(d) {
     navigate(`/users/${d.id}`);
@@ -77,33 +87,29 @@ function Users({ data, setData,viewObjData, deleteObj, editUserDetail, onisEdita
     onisEditable();
   }
 
+  //delete
+  useEffect(() => {
+    if (id) {
+      setModalIsOpen(true);
+    }
+  }, [id]);
+
   const openModal = (userId) => {
     setModalIsOpen(true);
-    navigate(`/users/delete/${userId}`)
-
-    // setdeleteId(id);
-    // navigate(`/users/delete/${id}`);
+    navigate(`/users/delete/${userId}`);
   };
 
   const closeModal = (e) => {
     e.preventDefault();
-    navigate("/users");
+    navigate(`/users?pageValue=${page}`);
     setModalIsOpen(false);
   };
 
-  // const deleteFunc = (id) =>{
-  //   openModal()
-  //   setdeleteId(id)
-  //   // deleteUser(id)
-  //   navigate(`/users/delete/${id}`)
-  // }
-
   const deleteUser = (e) => {
     e.preventDefault();
-    
     deleteObj(+id);
     setModalIsOpen(false);
-    navigate(`/users`);
+    navigate(`/users?pageValue=${page}`);
   };
 
   const customStyles = {
@@ -136,19 +142,14 @@ function Users({ data, setData,viewObjData, deleteObj, editUserDetail, onisEdita
         <thead>
           <tr>
             <th>Id</th>
-            <th >Name {<FaSortUp onClick={handleSortClick}/>}</th>
+            <th>Name {<FaSortUp onClick={handleSortClick} />}</th>
             <th>Email</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {records
-            .filter((item) => {
-              return search.toLowerCase() === ""
-                ? item
-                : item.name.toLowerCase().includes(search);
-            })
-            .map((d,i) => (
+          {datafilter.length > 0 ? (
+           datafilter.slice(page*selectedValue - selectedValue, page * selectedValue).map((d, i) => (
               <tr key={d.id}>
                 <td>{d.id}</td>
                 <td>{d.name}</td>
@@ -162,7 +163,7 @@ function Users({ data, setData,viewObjData, deleteObj, editUserDetail, onisEdita
                   </button>
                   <button
                     className="btn btn-sm ms-1 btn-danger"
-                    onClick={()=>openModal(+d.id)}
+                    onClick={() => openModal(+d.id)}
                   >
                     Delete
                   </button>
@@ -174,8 +175,11 @@ function Users({ data, setData,viewObjData, deleteObj, editUserDetail, onisEdita
                   </button>
                 </td>
               </tr>
-            ))}
-    
+            ))
+          ) : (
+            <p>Users Not found!!</p>
+          )}
+
           {modalIsOpen ? (
             <Modal
               isOpen={modalIsOpen}
@@ -186,10 +190,7 @@ function Users({ data, setData,viewObjData, deleteObj, editUserDetail, onisEdita
                 <form>
                   <label>Do you really want to delete?</label>
                   <br />
-                  <button
-                    className="btn btn-info"
-                    onClick={deleteUser}
-                  >
+                  <button className="btn btn-info ms-1" onClick={deleteUser}>
                     Yes
                   </button>
                   <button className="btn btn-info" onClick={closeModal}>
@@ -199,35 +200,75 @@ function Users({ data, setData,viewObjData, deleteObj, editUserDetail, onisEdita
               </div>
             </Modal>
           ) : (
-            <div></div>
+            <></>
           )}
         </tbody>
       </table>
-      <nav>
-        <ul className="pagination">
-          <li className="page-item">
-            <a href="#" className="page-link" onClick={prePage}>
-              Prev
-            </a>
-          </li>
-          {numbers.map((num, index) => (
+
+      {/* Pagination component */}
+      {datafilter.length > 0 && (
+          <ul className="pagination">
             <li
-              className={`page-item ${currentPage === num ? "active" : ""}`}
-              key={index}
+              className={`page-item ${+page === 1 ? "opacity-0 disabled" : ""}`}
             >
-              <a href="#" className="page-link" onClick={()=>changeCurrPage(num)}>
-                {num}
+              <a
+                className="page-link"
+                onClick={() => {
+                  selectPageHandler(+page - 1);
+                }}
+              >
+                Prev
               </a>
             </li>
-          ))}
-          <li className="page-item">
-            <a href="#" className="page-link" onClick={nextPage}>
-              Next
-            </a>
-          </li>
-        </ul>
-      </nav>
+            {[...Array(+noOfPages)].map((_, i) => {
+              return (
+                <li
+                  className={`page-item ${+page === i + 1 ? "active" : ""}`}
+                  key={i}
+                >
+                  <a
+                    className="page-link"
+                    onClick={() => selectPageHandler(i + 1)}
+                  >
+                    {i + 1}
+                  </a>
+                </li>
+              );
+            })}
 
+            <li
+              className={`page-item ${
+                page < noOfPages ? "" : "disabled opacity-0"
+              }`}
+            >
+              <a
+                className="page-link"
+                onClick={() => {
+                  selectPageHandler(+page + 1);
+                }}
+              >
+                Next
+              </a>
+            </li>
+
+            {/* for records per page */}
+            <label className="page-link ms-5">Records</label>
+            <select
+              value={selectedValue}
+              onChange={handleSelectChange}
+              className="page-link"
+            >
+              {Array.from({ length: 10 }, (_, index) => (
+                <option key={index} value={index + 1}>
+                  {index + 1}
+                </option>
+              ))}
+            </select>
+          </ul>
+      
+      )}
+   
+     
       <Outlet />
     </div>
   );

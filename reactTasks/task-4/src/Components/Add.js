@@ -2,68 +2,45 @@ import React,{useState} from 'react'
 import { useNavigate } from 'react-router-dom'
 import Validation from './Validation'
 
-function Add({addUser,editUser,setEditable,isEditable, mapForEdit,data}) {
-
+function Add({addUser,editUser,isEditable, mapForEdit,data}) {
 
   const [newUser,setNewUser] = useState({name:'',email:''})
-
-  
-  // const [newUserName,setNewUserName] = useState('')
-  // const [newUserEmail,setNewUserEmail] = useState('')
-  // const [updatedName, setUpdatedName] = useState(editUser?.name)
-  // const [updatedEmail, setUpdatedEmail] = useState(editUser?.email)
   const [updateUser,setUpdateUser] = useState({id:editUser?.id,
     name: editUser?.name, email: editUser?.email})
-  // const [isEditable,setEditable] = useState(false)
-  // console.log(editUser.name)
 
-//
-const [errors,setErrors] = useState({})
+   const [errors,setErrors] = useState({})
 
-// console.log(newUserName)
-  // console.log(updateUser,"updateuser")
   const navigat = useNavigate();
 
   function handleSubmit(event){
      event.preventDefault()
 
-     
-    
     if(isEditable)
     {
-      setErrors(Validation(updateUser))
-      console.log("update")
-      // const updatedObj ={
-      //     id: editUser.id,
-      //     name: updatedName,
-      //     email: updatedEmail
-      // }
-      // mapForEdit(editUser.id, updatedObj)
-      mapForEdit(editUser.id,updateUser)
+      // console.log(Validation(updateUser),"Validation(updateUser)")
+      let errDisplay =  Validation(updateUser)
+      
+      if(errDisplay.name || errDisplay.email){
+        setErrors(errDisplay)
+      }else{
+        mapForEdit(editUser.id,updateUser)
+        navigat('/users')
+      }
     }
     else
     {
       console.log("submit")
-      // const newUser = {
-      //   id: Math.random().toFixed(2).toString(),
-      //   name:newUserName,
-      //   email:newUserEmail
-      // }
-      setErrors(Validation(newUser))
-      const updatedUser ={ id: data[data.length - 1].id+1, ...newUser}
-      // addUser(newUser)
-      addUser(updatedUser)
+      // console.log(Validation(newUser),"Validation(newUser)")
+      let errDisplay = Validation(newUser)
+      if(errDisplay.name || errDisplay.email){
+        setErrors(errDisplay)
+      }else{
+        const updatedUser ={ id: data[data.length - 1].id+1, ...newUser}
+        addUser(updatedUser)
+        navigat('/users')
+      }
     }
-    //  
-    //  const editUpdateUser = {id:editUser.id , ...updateUser}
-    //  setEditable(true)
-    //  if(isEditable===true){
-    //    addUser(editUpdateUser)
-    //   }else{
-      //  addUser(updatedUser)
-    //  }
-    //  setCount((prev) => prev+1)
-     navigat('/users')
+    //  navigat('/users')
   }
 
   function updateEmailFun(e){

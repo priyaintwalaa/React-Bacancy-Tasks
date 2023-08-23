@@ -34,7 +34,6 @@ function App() {
   const mapForEdit =(id, itemObj) => {
       console.log(id)
       console.log(itemObj)
-
       const filterData = data.map( (user) => user.id === id ? itemObj : user)
       setData(filterData)
   }
@@ -56,10 +55,10 @@ function editUserDetail(obj){
     <Routes>
       <Route path='/' element={<Home />} />
       <Route path='/users' element={<UserHome/>} > 
-            <Route index element={<Users data={data} setData={setData} viewObjData={viewObjData}   editUserDetail={editUserDetail}  onisEditable={onisEditable} />  } />
+            <Route index element={<Users data={data} setData={setData} viewObjData={viewObjData} editUserDetail={editUserDetail}  onisEditable={onisEditable} />  } />
             <Route path='add' element={<Add addUser={addUser} data={data}/>}  />
             <Route path=':id' element={<UsersDetail viewObj={viewObj}  />} />
-            <Route path='edit/:id' element={<Add editUser={editUser} isEditable={isEditable} setEditable={setEditable}  mapForEdit={mapForEdit}/>} /> 
+            <Route path='edit/:id' element={<Add editUser={editUser} isEditable={isEditable}  mapForEdit={mapForEdit}/>} /> 
             <Route path='delete/:id' element={<Users data={data} deleteObj={deleteObj} />} /> 
       </Route>
     </Routes>
