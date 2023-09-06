@@ -23,13 +23,11 @@ function App() {
 
   function onisEditable(){
     setEditable(true) 
-
    }
 
   function viewObjData(objofsingleuser){
     setViewObj(objofsingleuser)
   }
-
 
   const mapForEdit =(id, itemObj) => {
       console.log(id)

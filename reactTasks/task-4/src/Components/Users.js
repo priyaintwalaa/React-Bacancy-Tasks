@@ -33,7 +33,6 @@ function Users({
     });
     setData(sortedData);
   };
-
   
   //search
   const datafilter = data.filter((item)=>{
@@ -50,29 +49,62 @@ function Users({
   const pageVal = searchParams.get('pageValue')
   console.log(pageVal)
 
+  const searchStr = searchParams.get('searchStr')
+  console.log(searchStr,"searching")
+
+  const pageLimit = searchParams.get('recordLimit')
+  console.log(pageLimit)
+
+ useEffect(()=>{
+    if(pageLimit){
+      setSeletectedValue(pageLimit)
+    }
+    if(searchStr){
+      setSearch(searchStr)
+    }
+
+    if(datafilter.slice(page*selectedValue - selectedValue, page * selectedValue).length === 0){
+      searchParams.set('pageValue',1)
+      setSearchParams(searchParams)
+    }
+
+ },[pageLimit,searchStr])
+
   useEffect(()=>{
     if(pageVal){
       setPage(pageVal)
-      console.log("sdfghjkl"+noOfPages +"dfghjkl"+pageVal)
+      // console.log("sdfghjkl"+noOfPages +"dfghjkl"+pageVal)
       if(+pageVal > noOfPages){
-        setSearchParams({pageValue:1})
-      }      
+        // setSearchParams({pageValue:1})
+        searchParams.set('pageValue',1)
+        setSearchParams(searchParams)
+      }
     }
   },[pageVal,search])
+
+  const searchHandler = (e)=>{
+    // setSearch(e.target.value)
+      searchParams.set('searchStr',e.target.value)
+      setSearchParams(searchParams)
+  }
 
   const selectPageHandler = (selectedPage) => {
     if (
       selectedPage >= 1 &&
       selectedPage <= noOfPages &&
-      selectedPage !== page
+      selectedPage !== page 
     )
     setPage(selectedPage);
-    setSearchParams({pageValue:selectedPage})
+    // setSearchParams({pageValue:selectedPage,recordlink:})
+    searchParams.set("pageValue",selectedPage);
+    setSearchParams(searchParams);
   };
 
   const handleSelectChange = (event) => {
     console.log(event.target.value);
     setSeletectedValue(event.target.value);
+    searchParams.set("recordLimit",event.target.value);
+    setSearchParams(searchParams);
   };
 
   function viewUser(d) {
@@ -130,8 +162,9 @@ function Users({
     <div className="container mt-5">
       <input
         type="text"
+        value={search}
         placeholder="search name"
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={searchHandler}
       />
       <div className="text-end">
         <Link to="/users/add" className="btn btn-primary">
@@ -268,7 +301,6 @@ function Users({
       
       )}
    
-     
       <Outlet />
     </div>
   );
