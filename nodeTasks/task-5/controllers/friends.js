@@ -5,12 +5,20 @@ exports.addFriend = async (req,res)=>{
     try {
         const {user_id,friend_ids}=req.body;
 
+        const user = await User.findById({user_id})
         const friend = await Friend.findOne({user_id})
-        console.log(friend)
+        
+        if(!user){
+            return res.status(404).json({ error: 'User not found!!' });
+        }
 
         if(friend){
             for(let i =0;i<friend_ids.length;i++){
-                friend.friend_ids.push(friend_ids[i])
+                if(user_id === friend_ids[i]){
+                    return res.status(404).json({error:"user cannot be friend of its own"})
+                }else{
+                    friend.friend_ids.push(friend_ids[i])
+                }
             }
             friend.save();
         }else{
@@ -30,6 +38,10 @@ exports.getFriend =async (req,res)=>{
         const userId = req.params.id;
 
         const user = await User.find({_id:userId})
+
+        if(!user){
+            return res.status(404).json({ error: 'User not found!!' });
+        }
 
         const friends = await Friend.find({user_id:userId}).populate('friend_ids','-_id -__v')
     

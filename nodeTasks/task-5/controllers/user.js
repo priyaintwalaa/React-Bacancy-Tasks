@@ -2,7 +2,7 @@ const User = require('../models/user')
 
 exports.addUser=async (req,res)=>{
     try {
-        const {name, age, phone_no} = req.body;
+     const {name, age, phone_no} = req.body;
 
     await User.create({
        name,age,phone_no
